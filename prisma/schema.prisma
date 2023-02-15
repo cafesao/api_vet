@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id           Int      @id @default(autoincrement())
+  first_name   String   @db.VarChar(100)
+  last_name    String   @db.VarChar(100)
+  phone_number Int
+  type         String   @db.VarChar(3)
+  document     Int      @unique
+  andress      Andress?
+  animal       Animal[]
+}
+
+model Andress {
+  id              Int     @id @default(autoincrement())
+  state           String  @db.VarChar(3)
+  city            String
+  road            String
+  number          Int
+  reference_point String?
+  client          Client  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId        Int     @unique
+}
+
+model Animal {
+  id       Int      @id @default(autoincrement())
+  name     String
+  type     String
+  age      String   @db.VarChar(6)
+  problem  Problem?
+  client   Client?  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId Int?     @unique
+}
+
+model Problem {
+  id              Int     @id @default(autoincrement())
+  explication     String
+  symptoms        String
+  as_time_problem String  @db.VarChar(6)
+  Animal          Animal? @relation(fields: [animalId], references: [id], onDelete: Cascade)
+  animalId        Int?    @unique
+}
