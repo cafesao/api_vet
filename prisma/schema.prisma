@@ -39,7 +39,7 @@ model Animal {
   age      String   @db.VarChar(6)
   problem  Problem?
   client   Client?  @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  clientId Int?     @unique
+  clientId Int
 }
 
 model Problem {

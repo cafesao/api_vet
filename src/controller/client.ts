@@ -11,7 +11,6 @@ const controller = {
       const response = await db.client.create({
         data: body
       })
-      console.log(response)
       res.sendStatus(201)
     } catch (error: any) {
       console.log(error)
@@ -19,7 +18,7 @@ const controller = {
     }
   },
   Read: async (req: Request, res: Response) => {
-    const id = Boolean(req.query.id)
+    const id = Number(req.query.id)
     const doc = Number(req.query.doc)
 
     try {
@@ -33,7 +32,7 @@ const controller = {
       if (id) {
         response = await db.client.findFirst({
           where: {
-            id: doc
+            id
           },
           include: {
             andress: true,
@@ -71,7 +70,7 @@ const controller = {
   },
   Update: async (req: Request, res: Response) => {
     const body = req.body
-    const id = Boolean(req.query.id)
+    const id = Number(req.query.id)
     const doc = Number(req.query.doc)
 
     try {
@@ -84,7 +83,7 @@ const controller = {
         response = await db.client.update({
           data: body,
           where: {
-            id: doc
+            id
           },
           include: {
             andress: true,
@@ -123,7 +122,7 @@ const controller = {
     }
   },
   Delete: async (req: Request, res: Response) => {
-    const id = Boolean(req.query.id)
+    const id = Number(req.query.id)
     const doc = Number(req.query.doc)
 
     try {
@@ -131,7 +130,7 @@ const controller = {
       if (id) {
         await db.client.delete({
           where: {
-            id: doc
+            id
           }
         })
       } else {
