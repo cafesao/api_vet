@@ -1,3 +1,4 @@
+import { Client, Andress, Animal, Problem } from "@prisma/client"
 import { Request, Response } from "express"
 
 import connectDB from "../db/connect"
@@ -22,7 +23,12 @@ const controller = {
     const doc = Number(req.query.doc)
 
     try {
-      let response
+      let response:
+        | (Client & {
+            andress: Andress | null
+            animal: (Animal & { problem: Problem | null })[]
+          })
+        | null
       const db = await connectDB()
       if (id) {
         response = await db.client.findFirst({
@@ -69,7 +75,10 @@ const controller = {
     const doc = Number(req.query.doc)
 
     try {
-      let response
+      let response: Client & {
+        andress: Andress | null
+        animal: (Animal & { problem: Problem | null })[]
+      }
       const db = await connectDB()
       if (id) {
         response = await db.client.update({
@@ -118,23 +127,22 @@ const controller = {
     const doc = Number(req.query.doc)
 
     try {
-      let response
       const db = await connectDB()
       if (id) {
-        response = await db.client.delete({
+        await db.client.delete({
           where: {
             id: doc
           }
         })
       } else {
-        response = await db.client.delete({
+        await db.client.delete({
           where: {
             document: doc
           }
         })
       }
 
-      return res.json(response).send()
+      return res.sendStatus(200)
     } catch (error: any) {
       if (error.code === "P2025") {
         return res.sendStatus(404)
