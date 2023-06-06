@@ -1,4 +1,3 @@
-import { Client, Andress, Animal, Problem } from "@prisma/client"
 import { Request, Response } from "express"
 
 import connectDB from "../db/connect"
@@ -8,7 +7,7 @@ const controller = {
     const body = req.body
     try {
       const db = await connectDB()
-      const response = await db.animal.create({
+      await db.animal.create({
         data: body
       })
       res.sendStatus(201)
@@ -25,35 +24,22 @@ const controller = {
   },
   Read: async (req: Request, res: Response) => {
     const id = Number(req.query.id)
-
     try {
-      let response:
-        | (Animal & {
-            problem: Problem | null
-            client: (Client & { andress: Andress | null }) | null
-          })
-        | (Client & {
-            andress: Andress | null
-            animal: (Animal & { problem: Problem | null })[]
-          })
-        | null = null
       const db = await connectDB()
-      if (id) {
-        response = await db.animal.findFirst({
-          where: {
-            id
-          },
-          include: {
-            client: {
-              include: {
-                andress: true
-              }
-            },
-            problem: true
-          }
-        })
-      }
 
+      const response = await db.animal.findFirst({
+        where: {
+          id
+        },
+        include: {
+          client: {
+            include: {
+              andress: true
+            }
+          },
+          problem: true
+        }
+      })
       if (response === null) {
         return res.sendStatus(404)
       }
@@ -68,34 +54,22 @@ const controller = {
     const id = Number(req.query.id)
 
     try {
-      let response:
-        | (Animal & {
-            problem: Problem | null
-            client: (Client & { andress: Andress | null }) | null
-          })
-        | (Client & {
-            andress: Andress | null
-            animal: (Animal & { problem: Problem | null })[]
-          })
-        | null = null
       const db = await connectDB()
-      if (id) {
-        response = await db.client.update({
-          data: body,
-          where: {
-            id
-          },
-          include: {
-            andress: true,
-            animal: {
-              include: {
-                problem: true
-              }
+
+      const response = await db.client.update({
+        data: body,
+        where: {
+          id
+        },
+        include: {
+          andress: true,
+          animal: {
+            include: {
+              problem: true
             }
           }
-        })
-      }
-
+        }
+      })
       return res.json(response).send()
     } catch (error: any) {
       if (error.code === "P2025") {
@@ -111,13 +85,12 @@ const controller = {
 
     try {
       const db = await connectDB()
-      if (id) {
-        await db.client.delete({
-          where: {
-            id
-          }
-        })
-      }
+
+      await db.client.delete({
+        where: {
+          id
+        }
+      })
 
       return res.sendStatus(200)
     } catch (error: any) {

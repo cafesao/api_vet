@@ -8,7 +8,7 @@ const controller = {
     const body = req.body
     try {
       const db = await connectDB()
-      const response = await db.client.create({
+      await db.client.create({
         data: body
       })
       res.sendStatus(201)
@@ -22,43 +22,18 @@ const controller = {
     const doc = Number(req.query.doc)
 
     try {
-      let response:
-        | (Client & {
-            andress: Andress | null
-            animal: (Animal & { problem: Problem | null })[]
-          })
-        | null
       const db = await connectDB()
-      if (id) {
-        response = await db.client.findFirst({
-          where: {
-            id
-          },
-          include: {
-            andress: true,
-            animal: {
-              include: {
-                problem: true
-              }
+      const response = await db.client.findFirst({
+        where: id ? { id } : { document: doc },
+        include: {
+          andress: true,
+          animal: {
+            include: {
+              problem: true
             }
           }
-        })
-      } else {
-        response = await db.client.findFirst({
-          where: {
-            document: doc
-          },
-          include: {
-            andress: true,
-            animal: {
-              include: {
-                problem: true
-              }
-            }
-          }
-        })
-      }
-
+        }
+      })
       if (response === null) {
         return res.sendStatus(404)
       }
@@ -74,43 +49,20 @@ const controller = {
     const doc = Number(req.query.doc)
 
     try {
-      let response: Client & {
-        andress: Andress | null
-        animal: (Animal & { problem: Problem | null })[]
-      }
       const db = await connectDB()
-      if (id) {
-        response = await db.client.update({
-          data: body,
-          where: {
-            id
-          },
-          include: {
-            andress: true,
-            animal: {
-              include: {
-                problem: true
-              }
-            }
-          }
-        })
-      } else {
-        response = await db.client.update({
-          data: body,
-          where: {
-            document: doc
-          },
-          include: {
-            andress: true,
-            animal: {
-              include: {
-                problem: true
-              }
-            }
-          }
-        })
-      }
 
+      const response = await db.client.update({
+        data: body,
+        where: id ? { id } : { document: doc },
+        include: {
+          andress: true,
+          animal: {
+            include: {
+              problem: true
+            }
+          }
+        }
+      })
       return res.json(response).send()
     } catch (error: any) {
       if (error.code === "P2025") {
@@ -127,19 +79,9 @@ const controller = {
 
     try {
       const db = await connectDB()
-      if (id) {
-        await db.client.delete({
-          where: {
-            id
-          }
-        })
-      } else {
-        await db.client.delete({
-          where: {
-            document: doc
-          }
-        })
-      }
+      await db.client.delete({
+        where: id ? { id } : { document: doc }
+      })
 
       return res.sendStatus(200)
     } catch (error: any) {
